@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Daily Diary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .mood-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .mood-option {
+            margin: 0 10px;
+        }
+        .entry {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+            position: relative;
+        }
+        .entry-date {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .entry-content {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .entry-images img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+        .entry-actions {
+            text-align: right;
+            position: absolute;
+            bottom: 0;
+            right: 10px;
+        }
+        .entry-actions button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .new-entry-form {
+            margin-bottom: 20px;
+        }
+        .new-entry-form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            resize: none;
+            margin-bottom: 10px;
+        }
+        .new-entry-form input[type="file"] {
+            margin-bottom: 10px;
+        }
+        .new-entry-form button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Daily Diary</h1>
+        <div class="mood-selector">
+            <label class="mood-option">
+                <input type="radio" name="mood" value="😄"> 😄
+            </label>
+            <label class="mood-option">
+                <input type="radio" name="mood" value="😢"> 😢
+            </label>
+            <label class="mood-option">
+                <input type="radio" name="mood" value="😊"> 😊
+            </label>
+            <label class="mood-option">
+                <input type="radio" name="mood" value="😡"> 😡
+            </label>
+            <label class="mood-option">
+                <input type="radio" name="mood" value="😴"> 😴
+            </label>
+        </div>
+        <div class="new-entry-form">
+            <textarea id="new-entry" rows="5" placeholder="Write your diary entry here..."></textarea>
+            <input type="file" id="image-upload" accept="image/*" multiple>
+            <button onclick="addEntry()">Add Entry</button>
+        </div>
+        <div id="diary-entries"></div>
+    </div>
+
+    <script>
+        function addEntry() {
+            var newEntryText = document.getElementById('new-entry').value;
+            var imageFiles = document.getElementById('image-upload').files;
+            var imageHTML = '';
+            if (imageFiles.length > 0) {
+                for (var i = 0; i < imageFiles.length; i++) {
+                    imageHTML += `<img src="${URL.createObjectURL(imageFiles[i])}" style="max-width: 100%; margin-right: 10px;">`;
+                }
+            }
+            if (newEntryText.trim() !== '' || imageFiles.length > 0) {
+                var currentDate = new Date();
+                var formattedDate = currentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                var entryHTML = `
+                    <div class="entry">
+                        <div class="entry-date">${formattedDate}</div>
+                        <div class="entry-content">${newEntryText}</div>
+                        <div class="entry-images">${imageHTML}</div>
+                        <div class="entry-actions">
+                            <button onclick="editEntry(this)">Edit</button>
+                            <button onclick="deleteEntry(this)">Delete</button>
+                        </div>
+                    </div>
+                `;
+                var diaryEntries = document.getElementById('diary-entries');
+                diaryEntries.innerHTML += entryHTML;
+                document.getElementById('new-entry').value = '';
+                document.getElementById('image-upload').value = '';
+            }
+        }
+
+        function editEntry(button) {
+            var entryContent = button.parentElement.parentElement.querySelector('.entry-content');
+            var newContent = prompt("Edit your diary entry:", entryContent.textContent);
+            if (newContent !== null) {
+                entryContent.textContent = newContent;
+            }
+        }
+
+        function deleteEntry(button) {
+            var entry = button.parentElement.parentElement;
+            entry.remove();
+        }
+    </script>
+</body>
+</html>
