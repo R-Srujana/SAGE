@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Quiz</title>
+  <style>
+    /* Add your CSS styles here */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #9370DB; /* Light purple background color */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .quiz-container {
+      width: 500px;
+      margin: 0 auto;
+      background-color: #fff; /* White background color */
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+      padding: 20px;
+    }
+    .question-box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .options label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    .btn {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .feedback {
+      margin-top: 20px;
+    }
+    .wrong-answer {
+      color: #ff0000;
+      font-weight: bold;
+    }
+    .correct-answer {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="question-box" id="question-box">
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+    </div>
+    <button class="btn" id="submit-btn">Submit</button>
+    <button class="btn" id="next-btn" style="display: none;">Next</button>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <script>
+    // Define quiz questions and answers
+    const quizData = [
+      {
+        question: "What is the largest planet in our solar system?",
+        options: ["Earth", "Jupiter", "Saturn", "Mars"],
+        correctAnswer: "Jupiter",
+        explanation: "The correct answer is B) Jupiter. Jupiter is the largest planet in our solar system, known for its massive size and swirling storms, including the famous Great Red Spot."
+      },
+      {
+        question: "Who was the first human to travel into space?",
+        options: ["Yuri Gagarin", "Neil Armstrong", "John Glenn", "Buzz Aldrin"],
+        correctAnswer: "Yuri Gagarin",
+        explanation: "The correct answer is A) Yuri Gagarin. Yuri Gagarin, a Soviet astronaut, was the first human to journey into outer space on April 12, 1961."
+      },
+      {
+        question: "What is the name of the first artificial satellite launched into space?",
+        options: ["Sputnik 1", "Explorer 1", "Vanguard 1", "Hubble Space Telescope"],
+        correctAnswer: "Sputnik 1",
+        explanation: "The correct answer is A) Sputnik 1. Sputnik 1 was the world's first artificial satellite, launched by the Soviet Union on October 4, 1957."
+      },
+      {
+        question: "Which spacecraft landed the first humans on the Moon?",
+        options: ["Apollo 11", "Voyager 1", "Hubble Space Telescope", "Mars Rover"],
+        correctAnswer: "Apollo 11",
+        explanation: "The correct answer is A) Apollo 11. The Apollo 11 mission, with astronauts Neil Armstrong and Buzz Aldrin, landed the first humans on the Moon on July 20, 1969."
+      },
+      {
+        question: "What is the name of the telescope that orbits Earth and has provided stunning images of deep space since its launch in 1990?",
+        options: ["Kepler Telescope", "Hubble Space Telescope", "James Webb Space Telescope", "Spitzer Space Telescope"],
+        correctAnswer: "Hubble Space Telescope",
+        explanation: "The correct answer is B) Hubble Space Telescope. The Hubble Space Telescope has been instrumental in advancing our understanding of the universe with its breathtaking images and scientific discoveries."
+      }
+    ];
+
+    // Initialize quiz variables
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    // Get HTML elements
+    const questionElement = document.getElementById('question');
+    const optionsElement = document.getElementById('options');
+    const submitButton = document.getElementById('submit-btn');
+    const nextButton = document.getElementById('next-btn');
+    const questionBox = document.getElementById('question-box');
+    const feedbackElement = document.getElementById('feedback');
+
+    // Function to render the current question
+    function renderQuestion() {
+      const currentQuestion = quizData[currentQuestionIndex];
+      questionElement.textContent = currentQuestion.question;
+      optionsElement.innerHTML = '';
+
+      currentQuestion.options.forEach((option, index) => {
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'option';
+        input.value = option;
+        input.id = 'option' + index;
+
+        const label = document.createElement('label');
+        label.textContent = option;
+        label.setAttribute('for', 'option' + index);
+
+        optionsElement.appendChild(input);
+        optionsElement.appendChild(label);
+      });
+    }
+
+    // Function to check the answer and move to the next question
+    function checkAnswer() {
+      const selectedOption = document.querySelector('input[name="option"]:checked');
+      if (!selectedOption) return; // No option selected
+
+      const selectedAnswer = selectedOption.value;
+      const currentQuestion = quizData[currentQuestionIndex];
+      if (selectedAnswer === currentQuestion.correctAnswer) {
+        score++; // Increment score for correct answer
+        feedbackElement.innerHTML = '<p class="correct-answer">Correct Answer!</p>'; // Display correct answer feedback
+        submitButton.style.display = 'none'; // Hide submit button
+        nextButton.style.display = 'inline-block'; // Show next button
+      } else {
+        feedbackElement.innerHTML = `<p class="wrong-answer">Wrong Answer!</p><p>${currentQuestion.explanation}</p>`;
+	submitButton.style.display = 'none'; // Hide submit button
+        nextButton.style.display = 'inline-block'; // Show next button
+
+      }
+    }
+
+    // Event listener for the Submit button
+    submitButton.addEventListener('click', checkAnswer);
+
+    // Event listener for the Next button
+    nextButton.addEventListener('click', () => {
+      currentQuestionIndex++; // Move to the next question
+      if (currentQuestionIndex < quizData.length) {
+        renderQuestion(); // Render the next question
+        submitButton.style.display = 'inline-block'; // Show submit button
+        nextButton.style.display = 'none'; // Hide next button
+        feedbackElement.innerHTML = ''; // Clear feedback
+      } else {
+        // End of quiz
+        alert(`Quiz ended. Your score: ${score}`);
+        // You can reset the quiz or perform other actions here
+      }
+    });
+
+    // Render the first question when the page loads
+    renderQuestion();
+  </script>
+</body>
+</html>
