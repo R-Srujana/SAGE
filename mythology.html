@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Quiz</title>
+  <style>
+   
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #9370DB;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .quiz-container {
+      width: 500px;
+      margin: 0 auto;
+      background-color: #fff; 
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+      padding: 20px;
+    }
+    .question-box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .options label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    .btn {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .feedback {
+      margin-top: 20px;
+    }
+    .wrong-answer {
+      color: #ff0000;
+      font-weight: bold;
+    }
+    .correct-answer {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="question-box" id="question-box">
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+    </div>
+    <button class="btn" id="submit-btn">Submit</button>
+    <button class="btn" id="next-btn" style="display: none;">Next</button>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <script>
+    // Define quiz questions and answers
+    const quizData = [
+      
+      {
+        question: "In Norse mythology, who is the wife of Odin, the Allfather?",
+        options: ["Freyja", "Frigg", "Hel", "Sif"],
+        correctAnswer: "Frigg",
+        explanation: "The correct answer is B) Frigg. Frigg is the queen of Asgard and the wife of Odin in Norse mythology."
+      },
+      {
+        question: "Which creature from Egyptian mythology has the body of a lion and the head of a human?",
+        options: ["Anubis", "Bastet", "Ammit", "Sphinx"],
+        correctAnswer: "Sphinx",
+        explanation: "The correct answer is D) Sphinx. The Sphinx is a mythical creature with the head of a human and the body of a lion, often depicted in Egyptian art and mythology."
+      },
+      {
+        question: "Who is the goddess of wisdom and warfare in Greek mythology?",
+        options: ["Hera", "Athena", "Aphrodite", "Demeter"],
+        correctAnswer: "Athena",
+        explanation: "The correct answer is B) Athena. Athena is the Greek goddess of wisdom, courage, inspiration, civilization, law and justice, strategic warfare, mathematics, strength, strategy, the arts, crafts, and skill."
+      },
+      {
+        question: "What is the name of the dragon in the Anglo-Saxon epic 'Beowulf'?",
+        options: ["Smaug", "Fafnir", "Nidhogg", "Grendel"],
+        correctAnswer: "Grendel",
+        explanation: "The correct answer is D) Grendel. Grendel is a monstrous creature defeated by the hero Beowulf in the epic poem 'Beowulf'."
+      },
+      {
+        question: "Who is the Hindu god of destruction and transformation?",
+        options: ["Brahma", "Vishnu", "Shiva", "Ganesha"],
+        correctAnswer: "Shiva",
+        explanation: "The correct answer is C) Shiva. Shiva is one of the principal deities of Hinduism and is often associated with destruction and transformation."
+      }
+     
+    ];
+
+    
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const questionElement = document.getElementById('question');
+    const optionsElement = document.getElementById('options');
+    const submitButton = document.getElementById('submit-btn');
+    const nextButton = document.getElementById('next-btn');
+    const questionBox = document.getElementById('question-box');
+    const feedbackElement = document.getElementById('feedback');
+
+    // Function to render the current question
+    function renderQuestion() {
+      const currentQuestion = quizData[currentQuestionIndex];
+      questionElement.textContent = currentQuestion.question;
+      optionsElement.innerHTML = '';
+
+      currentQuestion.options.forEach((option, index) => {
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'option';
+        input.value = option;
+        input.id = 'option' + index;
+
+        const label = document.createElement('label');
+        label.textContent = option;
+        label.setAttribute('for', 'option' + index);
+
+        optionsElement.appendChild(input);
+        optionsElement.appendChild(label);
+      });
+    }
+
+    // Function to check the answer and move to the next question
+    function checkAnswer() {
+      const selectedOption = document.querySelector('input[name="option"]:checked');
+      if (!selectedOption) return; // No option selected
+
+      const selectedAnswer = selectedOption.value;
+      const currentQuestion = quizData[currentQuestionIndex];
+      if (selectedAnswer === currentQuestion.correctAnswer) {
+        score++; // Increment score for correct answer
+        feedbackElement.innerHTML = '<p class="correct-answer">Correct Answer!</p>'; // Display correct answer feedback
+        submitButton.style.display = 'none'; // Hide submit button
+        nextButton.style.display = 'inline-block'; // Show next button
+      } else {
+        feedbackElement.innerHTML = `<p class="wrong-answer">Wrong Answer!</p><p>${currentQuestion.explanation}</p>`;
+	submitButton.style.display = 'none'; // Hide submit button
+        nextButton.style.display = 'inline-block'; // Show next button
+
+      }
+    }
+
+    // Event listener for the Submit button
+    submitButton.addEventListener('click', checkAnswer);
+
+    // Event listener for the Next button
+    nextButton.addEventListener('click', () => {
+      currentQuestionIndex++; // Move to the next question
+      if (currentQuestionIndex < quizData.length) {
+        renderQuestion(); // Render the next question
+        submitButton.style.display = 'inline-block'; // Show submit button
+        nextButton.style.display = 'none'; // Hide next button
+        feedbackElement.innerHTML = ''; // Clear feedback
+      } else {
+        // End of quiz
+        alert(`Quiz ended. Your score: ${score}`);
+        // You can reset the quiz or perform other actions here
+      }
+    });
+
+    // Render the first question when the page loads
+    renderQuestion();
+  </script>
+</body>
+</html>
